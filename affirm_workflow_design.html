@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affirm Servicing — From Data to Product</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue:#185FA5; --blue-lt:#E6F1FB; --blue-mid:#B5D4F4;
+    --red:#A32D2D; --red-lt:#FCEBEB;
+    --amber:#854F0B; --amber-lt:#FAEEDA;
+    --purple:#3C3489; --purple-lt:#EEEDFE;
+    --teal:#0F6E56; --teal-lt:#E1F5EE;
+    --green:#3B6D11; --green-lt:#EAF3DE;
+    --gray:#5F5E5A; --gray-lt:#F1EFE8;
+    --ink:#1a1a18; --muted:#5F5E5A; --faint:#888780;
+    --surface:#F8F7F4; --white:#FFFFFF;
+    --border:rgba(0,0,0,0.08); --border-md:rgba(0,0,0,0.13);
+    --radius:10px; --radius-lg:14px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; background:var(--surface); color:var(--ink); font-size:15px; line-height:1.6; }
+
+  nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.94); backdrop-filter:blur(14px); border-bottom:0.5px solid var(--border-md); padding:0 2.5rem; display:flex; align-items:center; justify-content:space-between; height:52px; }
+  .nav-brand { font-size:13px; font-weight:500; color:var(--ink); display:flex; align-items:center; gap:8px; }
+  .nav-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); }
+  .nav-links { display:flex; }
+  .nav-links a { font-size:12px; color:var(--muted); text-decoration:none; padding:5px 11px; border-radius:6px; }
+  .nav-links a:hover { background:var(--surface); color:var(--ink); }
+
+  .page { max-width:1020px; margin:0 auto; padding:0 2.5rem; }
+  section { padding:3.5rem 0; }
+  hr.div { border:none; border-top:0.5px solid var(--border); }
+
+  /* HERO */
+  .hero { background:var(--white); border-bottom:0.5px solid var(--border); padding:5rem 2rem 4rem; text-align:center; }
+  .hero-eyebrow { font-size:11px; font-weight:700; color:var(--teal); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:14px; }
+  .hero h1 { font-size:37px; font-weight:600; color:var(--ink); line-height:1.2; max-width:720px; margin:0 auto 18px; letter-spacing:-0.025em; }
+  .hero h1 em { font-style:normal; color:var(--teal); }
+  .hero-sub { font-size:16px; color:var(--muted); max-width:580px; margin:0 auto 30px; line-height:1.75; }
+  .hero-meta { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+  .hmeta { font-size:12px; color:var(--faint); }
+  .hmeta strong { color:var(--ink); }
+
+  /* BRIDGE BANNER */
+  .bridge { background:var(--teal-lt); border-top:3px solid var(--teal); padding:18px 2.5rem; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .bridge-text { font-size:13px; color:#0a5040; line-height:1.6; }
+  .bridge-text strong { color:var(--teal); }
+  .bridge-link { font-size:12px; font-weight:600; color:var(--teal); text-decoration:none; border:1px solid var(--teal); border-radius:6px; padding:6px 14px; white-space:nowrap; flex-shrink:0; }
+  .bridge-link:hover { background:var(--teal); color:var(--white); }
+
+  /* EYEBROW / TITLE */
+  .eyebrow { font-size:11px; font-weight:700; color:var(--faint); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px; }
+  .sec-title { font-size:22px; font-weight:600; color:var(--ink); letter-spacing:-0.015em; margin-bottom:8px; }
+  .sec-desc { font-size:14px; color:var(--muted); line-height:1.65; max-width:700px; }
+  .section-header { margin-bottom:2rem; }
+
+  /* CARDS */
+  .card { background:var(--white); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem; }
+  .card-sm { background:var(--white); border:0.5px solid var(--border); border-radius:var(--radius); padding:1.1rem 1.25rem; }
+  .card-title { font-size:13px; font-weight:600; color:var(--ink); margin-bottom:10px; }
+
+  /* GRIDS */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+  /* KPI */
+  .kpi { background:var(--white); border:0.5px solid var(--border); border-radius:var(--radius); padding:18px 20px; }
+  .kpi.blue  { border-top:2.5px solid var(--blue); }
+  .kpi.teal  { border-top:2.5px solid var(--teal); }
+  .kpi.amber { border-top:2.5px solid var(--amber); }
+  .kpi.red   { border-top:2.5px solid var(--red); }
+  .kpi-label { font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:500; }
+  .kpi-value { font-size:26px; font-weight:700; letter-spacing:-0.02em; line-height:1; }
+  .kpi-sub   { font-size:11px; color:var(--faint); margin-top:5px; line-height:1.45; }
+
+  /* INSIGHT */
+  .insight { border-radius:var(--radius); padding:14px 18px; font-size:13px; line-height:1.7; }
+  .insight.teal  { background:var(--teal-lt);  color:#0a5040; }
+  .insight.blue  { background:var(--blue-lt);  color:#0C447C; }
+  .insight.amber { background:var(--amber-lt); color:#5a3508; }
+  .insight.red   { background:var(--red-lt);   color:#7a1f1f; }
+
+  /* ASSUMPTION */
+  .assumption { background:var(--amber-lt); border:0.5px solid rgba(133,79,11,0.2); border-radius:var(--radius); padding:11px 15px; font-size:12px; color:#5a3508; line-height:1.6; margin-bottom:16px; }
+
+  /* BEFORE / AFTER */
+  .ba-wrap { border:0.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; margin-bottom:18px; }
+  .ba-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .ba-col { padding:20px 22px; }
+  .ba-col.before { background:var(--surface); border-right:0.5px solid var(--border); }
+  .ba-col.after  { background:var(--white); }
+  .ba-label { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+  .ba-step { display:flex; gap:10px; margin-bottom:11px; }
+  .ba-num { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .ba-text { font-size:12px; color:var(--muted); line-height:1.6; flex:1; }
+  .ba-text strong { color:var(--ink); }
+  .f-flag { display:inline-block; font-size:10px; font-weight:500; padding:2px 8px; border-radius:4px; margin-top:3px; background:var(--red-lt); color:var(--red); }
+  .a-flag { display:inline-block; font-size:10px; font-weight:500; padding:2px 8px; border-radius:4px; margin-top:3px; background:var(--teal-lt); color:var(--teal); }
+  .h-flag { display:inline-block; font-size:10px; font-weight:500; padding:2px 8px; border-radius:4px; margin-top:3px; background:var(--amber-lt); color:var(--amber); }
+
+  /* IMPACT STRIP */
+  .impact-strip { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius); padding:14px 20px; display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:18px; }
+  .impact-item { text-align:center; }
+  .impact-num { font-size:20px; font-weight:700; letter-spacing:-0.02em; }
+  .impact-label { font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .impact-div { width:0.5px; background:var(--border-md); align-self:stretch; }
+
+  /* CASE DEEP DIVES */
+  .dd { border:0.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px; }
+  .dd-header { padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; background:var(--white); }
+  .dd-header:hover { background:var(--surface); }
+  .dd-vol { font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+  .dd-title { font-size:15px; font-weight:600; color:var(--ink); flex:1; line-height:1.3; }
+  .dd-sub { font-size:12px; color:var(--faint); flex-shrink:0; }
+  .chevron { color:var(--faint); transition:transform 0.2s; flex-shrink:0; }
+  .dd.open .chevron { transform:rotate(90deg); }
+  .dd-body { display:none; border-top:0.5px solid var(--border); }
+  .dd.open .dd-body { display:block; }
+  .dd-inner { padding:24px; }
+
+  /* QUOTE CALLOUT */
+  .quote-pull { border-left:3px solid transparent; padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin-bottom:16px; }
+  .quote-pull p { font-size:13px; font-style:italic; line-height:1.75; color:var(--ink); margin-bottom:6px; }
+  .quote-pull .qmeta { font-size:11px; color:var(--faint); }
+
+  /* BETS SECTION */
+  .bet-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  .bet-card { background:var(--white); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:20px; position:relative; overflow:hidden; }
+  .bet-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .bet-card.now::before  { background:var(--teal); }
+  .bet-card.soon::before { background:var(--blue); }
+  .bet-num { font-size:11px; font-weight:700; color:var(--faint); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px; }
+  .bet-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:8px; line-height:1.35; }
+  .bet-why { font-size:12px; color:var(--muted); line-height:1.65; margin-bottom:14px; }
+  .bet-tags { display:flex; gap:6px; flex-wrap:wrap; }
+  .tag { font-size:11px; font-weight:500; padding:2px 9px; border-radius:20px; }
+
+  /* 2×2 MATRIX */
+  .matrix-wrap { border:0.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+  .matrix-inner { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; }
+  .matrix-q { padding:24px; border:0.5px solid var(--border); }
+  .matrix-q-label { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:12px; }
+  .matrix-item { display:flex; gap:8px; margin-bottom:8px; align-items:flex-start; font-size:12px; color:var(--muted); line-height:1.5; }
+  .matrix-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .matrix-axes { background:var(--surface); display:flex; justify-content:space-between; padding:8px 20px; font-size:11px; color:var(--faint); grid-column:1/-1; border-top:0.5px solid var(--border); }
+
+  /* METRICS */
+  .metric-row { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:0.5px solid var(--border); }
+  .metric-row:last-child { border-bottom:none; }
+  .metric-name { font-size:13px; font-weight:600; color:var(--ink); width:160px; flex-shrink:0; }
+  .metric-desc { font-size:12px; color:var(--muted); line-height:1.55; flex:1; }
+  .metric-target { font-size:12px; font-weight:600; width:120px; flex-shrink:0; text-align:right; }
+
+  /* ABOUT */
+  .about-strip { background:var(--white); border-top:0.5px solid var(--border); padding:2.5rem; }
+  .about-inner { max-width:1020px; margin:0 auto; display:flex; align-items:flex-start; gap:2rem; }
+  .about-avatar { width:48px; height:48px; border-radius:50%; background:var(--teal-lt); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:600; flex-shrink:0; }
+  .about-name { font-size:16px; font-weight:600; margin-bottom:2px; }
+  .about-role { font-size:13px; color:var(--muted); margin-bottom:8px; }
+  .about-body { font-size:13px; color:var(--muted); line-height:1.7; max-width:600px; }
+
+  footer { text-align:center; padding:2rem; font-size:11px; color:var(--faint); border-top:0.5px solid var(--border); }
+
+  @media (max-width:740px) {
+    .g2,.g3,.g4,.ba-grid,.bet-grid,.matrix-inner { grid-template-columns:1fr; }
+    nav .nav-links { display:none; }
+    .hero h1 { font-size:26px; }
+    .impact-strip { justify-content:center; }
+    .about-inner { flex-direction:column; }
+    .bridge { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand"><div class="nav-dot"></div>Affirm · From Data to Product</div>
+  <div class="nav-links">
+    <a href="#gap">The gap</a>
+    <a href="#cases">Case workflows</a>
+    <a href="#bets">Where to start</a>
+    <a href="#metrics">Metrics</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Product design</div>
+  <h1>Affirm already deflects 60% of support.<br><em>This is about the other 40%.</em></h1>
+  <p class="hero-sub">The CFPB complaint data and consumer reviews identify exactly which case types are failing to resolve. This document maps where each workflow breaks — and the four specific bets that would make a measurable difference right now.</p>
+  <div class="hero-meta">
+    <span class="hmeta"><strong>3</strong> case types dissected</span>
+    <span style="color:var(--border-md)">·</span>
+    <span class="hmeta"><strong>4</strong> product bets, sequenced by effort vs. impact</span>
+    <span style="color:var(--border-md)">·</span>
+    <span class="hmeta">Built on <strong>15,322 CFPB complaints + 926 reviews</strong></span>
+  </div>
+</div>
+
+<!-- THE GAP -->
+<section id="gap">
+  <div class="page">
+    <div class="section-header">
+      <div class="eyebrow">The starting point</div>
+      <div class="sec-title">60% is solved. The problem lives in the other 40%.</div>
+      <p class="sec-desc">Affirm's AI assistant in customer support chat already deflects over 60% of contacts without a human agent. That's a strong result — it means the simple, structured inquiries are largely handled. What's left in the 40% are the cases that require investigation, evidence gathering, or cross-system coordination. Those are exactly the cases generating CFPB complaints.</p>
+    </div>
+
+    <div class="g4" style="margin-bottom:20px;">
+      <div class="kpi teal">
+        <div class="kpi-label">Affirm AI deflection rate (confirmed)</div>
+        <div class="kpi-value" style="color:var(--teal)">60%+</div>
+        <div class="kpi-sub">Customers served by AI assistant who did not require further human assistance. Industry avg: 25–45%.</div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-label">The unresolved 40%</div>
+        <div class="kpi-value" style="color:var(--red)">Complex</div>
+        <div class="kpi-sub">Cases that clear the bot require investigation, merchant contact, bureau updates, or fraud determination. High cost, high frustration.</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-label">CFPB complaints 2021–2026</div>
+        <div class="kpi-value" style="color:var(--amber)">15,322</div>
+        <div class="kpi-sub">Every complaint is a case that cleared Affirm's full support process and still felt unresolved enough to file with a federal regulator.</div>
+      </div>
+      <div class="kpi blue">
+        <div class="kpi-label">Complaint growth since 2021</div>
+        <div class="kpi-value" style="color:var(--blue)">12×</div>
+        <div class="kpi-sub">430 in 2021 → 5,461 in 2025. Volume is accelerating faster than the existing process can absorb it.</div>
+      </div>
+    </div>
+
+    <div class="insight teal">
+      <strong>The key framing:</strong> The question isn't "should Affirm invest in AI for customer service?" — they already have. The question is where the AI boundary currently sits, and what specifically is failing in the cases that cross it. The CFPB data answers the second question precisely: credit errors, identity/fraud, and disputes are the dominant categories. This document is about the workflow inside those three.
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- CASE WORKFLOWS -->
+<section id="cases">
+  <div class="page">
+    <div class="section-header">
+      <div class="eyebrow">Case workflow analysis</div>
+      <div class="sec-title">Where each high-volume case type breaks — and what the fix looks like</div>
+      <p class="sec-desc">For each of the three dominant complaint categories from the CFPB data: one customer quote that illustrates the failure, the specific workflow friction point, and the targeted intervention. Workflow assumptions are noted explicitly.</p>
+    </div>
+
+    <!-- DD 1: CREDIT ERRORS -->
+    <div class="dd open" id="dd1">
+      <div class="dd-header" onclick="tog('dd1')">
+        <div class="dd-vol" style="background:var(--blue-lt);color:var(--blue)">4,011 CFPB · 144 reviews · #1 by volume</div>
+        <div class="dd-title">Credit reporting errors — account status, balance, or history reported incorrectly to bureaus</div>
+        <div class="dd-sub">26% of all filings</div>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="dd-body">
+        <div class="dd-inner">
+          <div class="quote-pull" style="background:var(--blue-lt);border-left-color:var(--blue);">
+            <p>"I paid in full a charged-off Affirm account. Made the full payment. A month later I submitted a dispute. I got a message that Affirm would not make changes because the account is being reflected correctly. Yet it still shows I have a balance. I have payment confirmation screenshots."</p>
+            <div class="qmeta">Sitejabber · 1★ · Mar 2025 — also appears as pattern in 1,132 CFPB sub-issue: "investigation did not fix an error"</div>
+          </div>
+
+          <div class="assumption"><strong>Assumption:</strong> Affirm furnishes credit data to bureaus via Metro 2 file format through a data furnisher interface. The internal account record (what Affirm knows) and the last-reported record (what was sent to bureaus) are two separate states that can drift apart.</div>
+
+          <div class="ba-wrap">
+            <div class="ba-grid">
+              <div class="ba-col before">
+                <div class="ba-label" style="color:var(--gray)">⬜ Today</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">1</div><div class="ba-text">Customer reports a credit error. Agent asks for account details and bureau name verbally or via form.</div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">2</div><div class="ba-text">Agent manually pulls account in Affirm's system. Looks at current status. <span class="f-flag">No automated view of what was actually reported to the bureau</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">3</div><div class="ba-text">Case sent to credit ops queue. Customer is told to wait. <span class="f-flag">No case ID shared. No status visibility. Re-contact begins immediately.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">4</div><div class="ba-text">Credit ops reviews. If error found, submits correction to bureau. <span class="f-flag">No automated confirmation that bureau accepted the update</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">5</div><div class="ba-text">Customer receives a form letter. No specifics about what changed or when. <span class="f-flag">"Did anything actually change?" re-contact follows</span></div></div>
+              </div>
+              <div class="ba-col after">
+                <div class="ba-label" style="color:var(--teal)">✦ With the fix</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">1</div><div class="ba-text"><strong>Structured intake:</strong> In-app flow captures which bureau, what the error is, approximate date — before any agent. Case arrives pre-classified. <span class="a-flag">Saves 2–3 min at intake</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">2</div><div class="ba-text"><strong>Auto reconciliation:</strong> System compares Affirm's internal state vs. last Metro 2 file. If mismatch is clear (paid account showing open, $0 balance showing positive) — flag as Type A: deterministic. <span class="a-flag">No human decision needed for ~35–40% of cases</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">3</div><div class="ba-text"><strong>Auto-submit Type A corrections.</strong> For ambiguous cases: agent opens to a side-by-side diff (Affirm record vs. reported) and approves correction in one click. <span class="h-flag">Human judgment stays for disputes of ownership or identity conflicts</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">4</div><div class="ba-text"><strong>Bureau confirmation tracking:</strong> System monitors for bureau acknowledgment. If not confirmed in 5 business days, auto-escalates. <span class="a-flag">Closes the loop the current process leaves open</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">5</div><div class="ba-text"><strong>Specific notification:</strong> "Account corrected from charged-off to paid in full on [date]. Bureau should update within 30–45 days. We'll confirm when they acknowledge." <span class="a-flag">Eliminates the "did anything change?" re-contact</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="impact-strip">
+            <div class="impact-item"><div class="impact-num" style="color:var(--teal)">~1,400</div><div class="impact-label">cases/yr auto-resolvable without agent touch</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--blue)">-2–3 min</div><div class="impact-label">AHT per case from structured intake</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--amber)">FCRA</div><div class="impact-label">Automated audit log satisfies furnisher obligations</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--red)">↓ re-contact</div><div class="impact-label">Specific closure letter eliminates follow-up inquiry</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DD 2: IDENTITY & FRAUD -->
+    <div class="dd" id="dd2">
+      <div class="dd-header" onclick="tog('dd2')">
+        <div class="dd-vol" style="background:var(--red-lt);color:var(--red)">3,377 CFPB · 203 reviews · avg 1.20★</div>
+        <div class="dd-title">Identity & fraud — unauthorized account, unknown transaction, account compromised</div>
+        <div class="dd-sub">22% of all filings</div>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="dd-body">
+        <div class="dd-inner">
+          <div class="quote-pull" style="background:var(--red-lt);border-left-color:var(--red);">
+            <p>"My account has been locked for going on a couple of years now, with no help from multiple phone calls at various intervals. They keep telling me they can't verify my identity because the name doesn't match — even though my phone number, email, and date of birth are correct. I've expressed my account security concerns repeatedly and nothing moves."</p>
+            <div class="qmeta">Sitejabber · 1★ · Sep 2025 — pattern confirmed across 203 public reviews and 1,417 CFPB "information belongs to someone else" sub-issues</div>
+          </div>
+
+          <div class="assumption"><strong>Assumption:</strong> Fraud cases are triaged manually after an agent creates the case. Investigation signals (device, location, velocity) exist in Affirm's system but are not automatically surfaced to analysts. Bureau remediation is handled separately from the fraud case itself.</div>
+
+          <div class="ba-wrap">
+            <div class="ba-grid">
+              <div class="ba-col before">
+                <div class="ba-label" style="color:var(--gray)">⬜ Today</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">1</div><div class="ba-text">Customer reports fraud. Agent verifies identity, flags account. No case ID given. <span class="f-flag">Customer has no evidence they were heard</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">2</div><div class="ba-text">Account frozen. Customer told "wait 30 days." <span class="f-flag">No reference number. No portal to check status. Re-contact loop begins.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">3</div><div class="ba-text">Fraud team investigates — device, IP, velocity. Each analyst may check different signals. <span class="f-flag">No standardized checklist. Analyst-to-analyst variance in what gets reviewed.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">4</div><div class="ba-text">Decision communicated. If denied: "we reviewed and confirmed this is your account." <span class="f-flag">No evidence shared. No basis given. Customer files CFPB complaint.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">5</div><div class="ba-text">If fraud confirmed: account closed. Bureau correction filed separately as a different case. <span class="f-flag">Customer must call back again to fix credit report</span></div></div>
+              </div>
+              <div class="ba-col after">
+                <div class="ba-label" style="color:var(--teal)">✦ With the fix</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">1</div><div class="ba-text"><strong>Signal pre-score at case creation:</strong> Device match, geolocation anomaly, account-age, transaction velocity — scored automatically before analyst opens the case. Not a decision; a starting point. <span class="a-flag">Analyst knows where to look before reading the complaint</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">2</div><div class="ba-text"><strong>Case ID + status portal immediately on creation:</strong> Customer receives a reference number and a link showing: evidence received → under review → decision made. No black box. <span class="a-flag">Estimated 40–50% reduction in re-contact from status inquiries alone</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">3</div><div class="ba-text"><strong>Structured evidence intake:</strong> Customer prompted (via portal) for ID, police report if available, conflicting transaction evidence. Analyst receives an organized case file, not a free-form email thread. <span class="a-flag">AI parses uploaded documents, pre-populates investigation fields</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">4</div><div class="ba-text"><strong>Standardized investigation checklist:</strong> Consistent signal review framework logged per case. Decision recorded with specific basis. <span class="h-flag">Final fraud determination stays with a trained human analyst — always. AI assists, does not decide.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">5</div><div class="ba-text"><strong>Decision with basis + bundled remediation:</strong> If fraud confirmed, bureau correction auto-triggered as part of the same case close — not a separate process. If denied, customer receives specific explanation of what signals were reviewed. <span class="a-flag">Eliminates "won't explain the decision" CFPB trigger</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="impact-strip">
+            <div class="impact-item"><div class="impact-num" style="color:var(--teal)">40–50%</div><div class="impact-label">estimated re-contact reduction from case status portal</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--blue)">Consistent</div><div class="impact-label">Investigation checklist reduces analyst variance — same signals reviewed every case</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--red)">↓ CFPB</div><div class="impact-label">"Wouldn't explain the decision" is a primary escalation driver — specificity reduces it</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--purple)">Bundled</div><div class="impact-label">Bureau remediation triggered on case close — no second call required</div></div>
+          </div>
+
+          <div class="insight blue">
+            <strong>The key insight:</strong> The biggest frustration in fraud cases is not the outcome — it's the opacity of the process. Customers who understand what was reviewed and why a decision was made are significantly less likely to escalate, even if the outcome went against them. A case portal with real-time status is a product/UX intervention that has faster ROI than changing the investigation model.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DD 3: DISPUTE RESOLUTION -->
+    <div class="dd" id="dd3">
+      <div class="dd-header" onclick="tog('dd3')">
+        <div class="dd-vol" style="background:var(--purple-lt);color:var(--purple)">1,721 CFPB · 82 reviews · lowest avg rating 1.09★</div>
+        <div class="dd-title">Dispute resolution — item not received, merchant unresponsive, refund not applied to loan</div>
+        <div class="dd-sub">11% of filings · every CFPB case is a re-escalation from a failed first dispute</div>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="dd-body">
+        <div class="dd-inner">
+          <div class="quote-pull" style="background:var(--purple-lt);border-left-color:var(--purple);">
+            <p>"I am posting this after my dispute, appeal, and multiple escalations with Affirm Customer Care were all denied, despite extensive documentation and good-faith efforts. The merchant marked the item as 'shipped' but carrier tracking showed it was still 'waiting for information' — meaning the item had not been handed to the carrier. Affirm denied my dispute anyway."</p>
+            <div class="qmeta">Sitejabber · 1★ · Jan 2026 — confirms CFPB sub-issue: "investigation did not fix an error on your report" (1,132 complaints)</div>
+          </div>
+
+          <div class="assumption"><strong>Assumption:</strong> Dispute resolution requires merchant outreach which is currently handled manually (email or portal). No automated SLA enforcement on merchant response. Investigation outcome is based on whatever evidence the merchant provides, with limited ability to cross-check carrier data independently.</div>
+
+          <div class="ba-wrap">
+            <div class="ba-grid">
+              <div class="ba-col before">
+                <div class="ba-label" style="color:var(--gray)">⬜ Today</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">1</div><div class="ba-text">Customer files dispute. Agent creates case. <span class="f-flag">No structured confirmation sent. Customer doesn't know if it was actually created.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">2</div><div class="ba-text">Agent emails merchant to request evidence. No SLA. <span class="f-flag">Days or weeks pass with no movement. Customer calls to ask what's happening.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">3</div><div class="ba-text">Merchant provides tracking showing "delivered." Dispute denied. <span class="f-flag">"Delivered" ≠ received. No tool to probe tracking anomalies independently.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--gray-lt);color:var(--gray)">4</div><div class="ba-text">Form letter sent: "we reviewed and found in favor of the merchant." <span class="f-flag">No evidence shared. No appeal path explained. CFPB filing follows.</span></div></div>
+              </div>
+              <div class="ba-col after">
+                <div class="ba-label" style="color:var(--teal)">✦ With the fix</div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">1</div><div class="ba-text"><strong>Dispute type classification at intake:</strong> Four tracks (item not received / not as described / merchant fraud / duplicate charge). Each track has different evidence requirements. Routing correctly from the start eliminates rework. <span class="a-flag">Rule-based — no model needed</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">2</div><div class="ba-text"><strong>Automated Day 0 merchant outreach</strong> on case creation — not when an agent gets to it. Day 5 reminder. Day 7: auto-escalate for provisional credit consideration. <span class="a-flag">SLA enforced by system, not by agent memory. Removes weeks of inactivity.</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">3</div><div class="ba-text"><strong>Tracking anomaly detection:</strong> System pulls carrier scan data directly. Flags anomalies — last scan not at delivery address, label printed but never tendered, weight mismatch. Agent receives pre-analyzed evidence summary. <span class="a-flag">Agent has a tool to probe beyond "tracking shows delivered"</span></div></div>
+                <div class="ba-step"><div class="ba-num" style="background:var(--teal-lt);color:var(--teal)">4</div><div class="ba-text"><strong>Decision with specific basis + appeal path:</strong> AI drafts response from case record (what was reviewed, what was found). Agent approves. Customer receives specifics — and a clear explanation of how to submit additional evidence if they disagree. <span class="h-flag">Agent makes the determination. AI reduces drafting time by ~3 min.</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="impact-strip">
+            <div class="impact-item"><div class="impact-num" style="color:var(--teal)">Day 0</div><div class="impact-label">Merchant outreach starts at case creation, not when an agent picks it up</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--blue)">-3 min</div><div class="impact-label">AHT from AI-drafted decision communication</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--purple)">1.09★</div><div class="impact-label">Worst-rated case type in reviews — process transparency is the primary lever</div></div>
+            <div class="impact-div"></div>
+            <div class="impact-item"><div class="impact-num" style="color:var(--amber)">Appeal path</div><div class="impact-label">Explaining how to submit additional evidence reduces escalation to CFPB</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ARCHITECTURE DIAGRAM -->
+<section id="arch" style="background:var(--bg);">
+  <div class="container">
+
+    <div class="section-header">
+      <div class="eyebrow">Case Architecture</div>
+      <div class="sec-title">How a credit error case flows end-to-end</div>
+      <p class="sec-desc">Credit reporting errors are the highest-volume complex case type — 4,011 CFPB complaints, avg review rating 1.23 out of 5. The workflow below maps the full journey: from the moment a customer contacts Affirm to bureau confirmation and case closure. Two design decisions define this architecture: Metro 2 reconciliation is fully automated, and a Type A / Type B split separates deterministic fixes from cases that need agent judgment.</p>
+    </div>
+
+    <div class="dd-card">
+
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding:12px 16px;background:var(--surface);border-radius:8px;border:1px solid rgba(0,0,0,0.07);">
+        <span style="font-size:10px;font-weight:700;color:var(--gray);letter-spacing:0.08em;text-transform:uppercase;">Legend</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#E1F5EE;border:1.5px solid #0F6E56;flex-shrink:0"></span>AI / Automated</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#E6F1FB;border:1.5px solid #185FA5;flex-shrink:0"></span>Human agent</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:10px;height:10px;transform:rotate(45deg);background:#FAEEDA;border:1.5px solid #854F0B;flex-shrink:0;margin:1px 2px"></span>Decision</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#EEEDFE;border:1.5px solid #3C3489;flex-shrink:0"></span>External / Bureau</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#EAF3DE;border:1.5px solid #3B6D11;flex-shrink:0"></span>Resolution</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray)"><span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:#F8F7F4;border:1.5px solid #C8C7C2;flex-shrink:0"></span>Channel / system</span>
+      </div>
+
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <svg viewBox="0 0 880 1068" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:540px;" role="img" aria-label="Credit reporting error case architecture flow">
+          <defs>
+            <marker id="arch-ah" viewBox="0 0 8 6" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#888780"/></marker>
+            <marker id="arch-ah-grn" viewBox="0 0 8 6" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#3B6D11"/></marker>
+          </defs>
+
+          <!-- ════════════════════════════════ CHANNELS ════════════════════════════════ -->
+          <rect x="8" y="16" width="200" height="58" rx="8" fill="#F8F7F4" stroke="#C8C7C2" stroke-width="1"/>
+          <text x="108" y="41" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a18">💬 In-app Chat</text>
+          <text x="108" y="59" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#888780">Authenticated session</text>
+
+          <rect x="340" y="16" width="200" height="58" rx="8" fill="#F8F7F4" stroke="#C8C7C2" stroke-width="1"/>
+          <text x="440" y="41" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a18">📞 Phone / IVR</text>
+          <text x="440" y="59" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#888780">Agent-verified identity</text>
+
+          <rect x="672" y="16" width="200" height="58" rx="8" fill="#F8F7F4" stroke="#C8C7C2" stroke-width="1"/>
+          <text x="772" y="41" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a18">📧 Email</text>
+          <text x="772" y="59" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#888780">NLP content extraction</text>
+
+          <!-- Channel convergence bus -->
+          <line x1="108" y1="74" x2="108" y2="100" stroke="#C8C7C2" stroke-width="1.5"/>
+          <line x1="440" y1="74" x2="440" y2="100" stroke="#C8C7C2" stroke-width="1.5"/>
+          <line x1="772" y1="74" x2="772" y2="100" stroke="#C8C7C2" stroke-width="1.5"/>
+          <line x1="108" y1="100" x2="772" y2="100" stroke="#C8C7C2" stroke-width="1.5"/>
+          <path d="M440,100 L440,112" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ CASE CREATED ════════════════════════════════ -->
+          <rect x="240" y="112" width="400" height="60" rx="8" fill="white" stroke="#C8C7C2" stroke-width="1"/>
+          <text x="440" y="137" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a18">Case Created · ID Assigned</text>
+          <text x="440" y="156" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Customer authenticated · Status portal initialized · SLA timer starts</text>
+
+          <path d="M440,172 L440,192" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ AI CLASSIFICATION ════════════════════════════════ -->
+          <rect x="240" y="192" width="400" height="62" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="440" y="213" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#0F6E56" letter-spacing="1">⚡ AI / AUTOMATED</text>
+          <text x="440" y="231" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a18">AI Classification Engine</text>
+          <text x="440" y="249" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Bureau identified · Error type extracted · Issue categorized</text>
+
+          <path d="M440,254 L440,274" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ METRO 2 CHECK ════════════════════════════════ -->
+          <rect x="240" y="274" width="400" height="62" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="440" y="295" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#0F6E56" letter-spacing="1">⚡ AI / AUTOMATED</text>
+          <text x="440" y="313" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a18">Metro 2 Reconciliation</text>
+          <text x="440" y="331" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Internal record vs. last furnished data — discrepancy auto-detected</text>
+
+          <path d="M440,336 L440,362" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ DECISION 1: DISCREPANCY? ════════════════════════════════ -->
+          <polygon points="440,362 524,400 440,438 356,400" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5"/>
+          <text x="440" y="394" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">Discrepancy</text>
+          <text x="440" y="410" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">found?</text>
+
+          <!-- NO → right -->
+          <path d="M524,400 L668,400 L668,446" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+          <text x="596" y="392" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" font-weight="700" fill="#888780">NO</text>
+
+          <!-- YES → left -->
+          <path d="M356,400 L200,400 L200,448" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+          <text x="276" y="392" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" font-weight="700" fill="#5F5E5A">YES</text>
+
+          <!-- ════════════════════════════════ NO-ERROR BOX ════════════════════════════════ -->
+          <rect x="568" y="446" width="200" height="58" rx="8" fill="#F8F7F4" stroke="#C8C7C2" stroke-width="1"/>
+          <text x="668" y="470" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="600" fill="#5F5E5A">No Error Found</text>
+          <text x="668" y="488" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#888780">Case closed · Explanation sent to customer</text>
+
+          <!-- ════════════════════════════════ DECISION 2: ERROR TYPE? ════════════════════════════════ -->
+          <polygon points="200,448 278,488 200,528 122,488" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5"/>
+          <text x="200" y="482" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">Error</text>
+          <text x="200" y="498" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">type?</text>
+
+          <!-- Type A → left -->
+          <path d="M122,488 L64,488 L64,546" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+          <text x="89" y="480" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#0F6E56">Type A</text>
+
+          <!-- Type B → right -->
+          <path d="M278,488 L348,488 L348,546" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+          <text x="320" y="480" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#185FA5">Type B</text>
+
+          <!-- ════════════════════════════════ TYPE A BOX ════════════════════════════════ -->
+          <rect x="8" y="546" width="116" height="74" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="66" y="566" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#0F6E56">⚡ AUTO</text>
+          <text x="66" y="583" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a18">Type A</text>
+          <text x="66" y="599" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Deterministic</text>
+          <text x="66" y="614" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">auto-submit</text>
+
+          <!-- ════════════════════════════════ TYPE B BOX ════════════════════════════════ -->
+          <rect x="276" y="546" width="144" height="74" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+          <text x="348" y="566" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#185FA5">👤 HUMAN</text>
+          <text x="348" y="583" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1a1a18">Type B</text>
+          <text x="348" y="599" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Agent reviews</text>
+          <text x="348" y="614" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">diff context card</text>
+
+          <!-- ════════════════════════════════ MERGE BUS → BUREAU ════════════════════════════════ -->
+          <path d="M66,620 L66,664 L440,664" fill="none" stroke="#888780" stroke-width="1.5"/>
+          <path d="M348,620 L348,664" fill="none" stroke="#888780" stroke-width="1.5"/>
+          <path d="M440,664 L440,686" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ BUREAU SUBMISSION ════════════════════════════════ -->
+          <rect x="240" y="686" width="400" height="62" rx="8" fill="#EEEDFE" stroke="#3C3489" stroke-width="1.5"/>
+          <text x="440" y="707" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#3C3489" letter-spacing="1">EXTERNAL</text>
+          <text x="440" y="725" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a18">Bureau Submission</text>
+          <text x="440" y="743" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Correction filed via data furnisher · FCRA audit log created automatically</text>
+
+          <path d="M440,748 L440,768" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ CONFIRMATION TRACKER ════════════════════════════════ -->
+          <rect x="240" y="768" width="400" height="62" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="440" y="789" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="9" font-weight="700" fill="#0F6E56" letter-spacing="1">⚡ AI / AUTOMATED</text>
+          <text x="440" y="807" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1a1a18">Confirmation Tracker · 5-day SLA</text>
+          <text x="440" y="825" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Bureau acknowledgment monitored · Auto-escalate if no response by Day 5</text>
+
+          <path d="M440,830 L440,858" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+
+          <!-- ════════════════════════════════ DECISION 3: CONFIRMED? ════════════════════════════════ -->
+          <polygon points="440,858 524,896 440,934 356,896" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5"/>
+          <text x="440" y="890" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">Bureau</text>
+          <text x="440" y="906" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="11" font-weight="700" fill="#854F0B">confirmed?</text>
+
+          <!-- NO → left to Auto-escalate -->
+          <path d="M356,896 L200,896 L200,942" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#arch-ah)"/>
+          <text x="276" y="888" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" font-weight="700" fill="#888780">NO</text>
+
+          <!-- YES → right to Notification -->
+          <path d="M524,896 L668,896 L668,942" fill="none" stroke="#3B6D11" stroke-width="1.5" marker-end="url(#arch-ah-grn)"/>
+          <text x="596" y="888" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" font-weight="700" fill="#3B6D11">YES</text>
+
+          <!-- ════════════════════════════════ AUTO-ESCALATE ════════════════════════════════ -->
+          <rect x="100" y="942" width="200" height="62" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="1.5"/>
+          <text x="200" y="966" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#A32D2D">Auto-Escalate</text>
+          <text x="200" y="983" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Day 5 trigger · Ops review queue</text>
+
+          <!-- ════════════════════════════════ CUSTOMER NOTIFICATION ════════════════════════════════ -->
+          <rect x="568" y="942" width="200" height="62" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+          <text x="668" y="966" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700" fill="#3B6D11">Specific Notification</text>
+          <text x="668" y="983" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">What changed · Date · Expected timeline</text>
+
+          <path d="M668,1004 L668,1022" fill="none" stroke="#3B6D11" stroke-width="1.5" marker-end="url(#arch-ah-grn)"/>
+
+          <!-- ════════════════════════════════ CASE CLOSED ════════════════════════════════ -->
+          <rect x="568" y="1022" width="200" height="46" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+          <text x="668" y="1042" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700" fill="#3B6D11">Case Closed ✓</text>
+          <text x="668" y="1059" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" font-size="10" fill="#5F5E5A">Portal updated · Audit logged</text>
+
+        </svg>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(0,0,0,0.07);">
+        <div style="padding:14px 16px;border-radius:8px;background:var(--surface);border-left:3px solid var(--teal);">
+          <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px;">Metro 2 reconciliation is fully automated</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.5">No agent is needed to spot the discrepancy — the system compares what Affirm holds vs. what was last furnished to the bureau.</div>
+        </div>
+        <div style="padding:14px 16px;border-radius:8px;background:var(--surface);border-left:3px solid var(--blue);">
+          <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;">Type A / B handles judgment calls cleanly</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.5">Deterministic errors auto-submit. Ambiguous ones surface a pre-built diff context card so agent review takes minutes, not hours.</div>
+        </div>
+        <div style="padding:14px 16px;border-radius:8px;background:var(--surface);border-left:3px solid var(--purple);">
+          <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;">The loop doesn't close until confirmed</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.5">Bureau confirmation tracking turns a fire-and-forget submission into a closed system. Day 5 auto-escalate ensures nothing silently expires.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WHERE TO START -->
+<section id="bets">
+  <div class="page">
+    <div class="section-header">
+      <div class="eyebrow">Where to start</div>
+      <div class="sec-title">Four specific bets — sequenced by effort vs. impact</div>
+      <p class="sec-desc">Not everything described above needs to be built at once. These four bets are ordered by the ratio of impact to engineering effort. The first two don't require an AI model at all — they're workflow and communication problems. The latter two build on the data foundation the first two create.</p>
+    </div>
+
+    <div class="bet-grid" style="margin-bottom:20px;">
+
+      <div class="bet-card now">
+        <div class="bet-num">Bet 1 — Do now · weeks, not months</div>
+        <div class="bet-title">Agent handover context card</div>
+        <div class="bet-why">When the AI bot escalates to a human, the agent opens a blank slate. The customer repeats their entire story. A structured handover — what the bot tried, what the customer said, pre-pulled account snapshot, case type prediction — is a <em>presentation layer problem</em>. Affirm already has all this data. It's just not surfaced at handover. Every complex case improves immediately.</div>
+        <div class="bet-tags">
+          <span class="tag" style="background:var(--teal-lt);color:var(--teal)">No new data source</span>
+          <span class="tag" style="background:var(--teal-lt);color:var(--teal)">Ships in weeks</span>
+          <span class="tag" style="background:var(--blue-lt);color:var(--blue)">Target: -3–4 min AHT per case</span>
+        </div>
+      </div>
+
+      <div class="bet-card now">
+        <div class="bet-num">Bet 2 — Do now · no AI required</div>
+        <div class="bet-title">Automated merchant SLA enforcement for disputes</div>
+        <div class="bet-why">Dispute cases have the worst satisfaction rating (1.09★). The root cause is simple: merchant response is slow and there's no enforcement. Day 0 auto-outreach → Day 5 reminder → Day 7 escalation with provisional credit consideration. This is a rule engine, not a model — and it removes the single biggest source of dispute case delay without waiting on engineering for an AI build.</div>
+        <div class="bet-tags">
+          <span class="tag" style="background:var(--teal-lt);color:var(--teal)">Rule engine, not AI</span>
+          <span class="tag" style="background:var(--teal-lt);color:var(--teal)">Ships in a sprint</span>
+          <span class="tag" style="background:var(--blue-lt);color:var(--blue)">Addresses 1,721 cases/yr</span>
+        </div>
+      </div>
+
+      <div class="bet-card soon">
+        <div class="bet-num">Bet 3 — Next · medium complexity</div>
+        <div class="bet-title">Credit error status communication rebuild</div>
+        <div class="bet-why">4,011 CFPB cases. After a correction is submitted to a bureau, customers receive a generic form letter. Replace it with a specific notification: what was corrected, when it was submitted, confirmation when the bureau acknowledges receipt. The data for this exists — it's a trigger and template change on the existing notification system. Re-contact from "did anything actually change?" drops significantly.</div>
+        <div class="bet-tags">
+          <span class="tag" style="background:var(--blue-lt);color:var(--blue)">Notification trigger + template</span>
+          <span class="tag" style="background:var(--blue-lt);color:var(--blue)">Kills the re-contact inquiry</span>
+          <span class="tag" style="background:var(--purple-lt);color:var(--purple)">Needs bureau confirmation loop first</span>
+        </div>
+      </div>
+
+      <div class="bet-card soon">
+        <div class="bet-num">Bet 4 — Medium-term · requires data foundation</div>
+        <div class="bet-title">CFPB escalation prediction model</div>
+        <div class="bet-why">The CFPB complaint pattern is learnable: dispute denied with no explanation + no acknowledgment of appeal path = CFPB filing within 30 days. A model that flags "this case has a high escalation probability before it closes" gives agents a window to proactively reach out with a better resolution. This requires the re-contact rate baseline and case history data that Bets 1–3 create — it's a Phase 2 build, not Day 1.</div>
+        <div class="bet-tags">
+          <span class="tag" style="background:var(--blue-lt);color:var(--blue)">Requires Phase 1 data</span>
+          <span class="tag" style="background:var(--amber-lt);color:var(--amber)">Target: -15% CFPB escalation rate</span>
+          <span class="tag" style="background:var(--purple-lt);color:var(--purple)">ML model — higher build complexity</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 2x2 MATRIX -->
+    <div style="margin-bottom:8px;font-size:12px;color:var(--muted);">Effort vs. impact — where the four bets sit</div>
+    <div class="matrix-wrap" style="margin-bottom:20px;">
+      <div class="matrix-inner">
+        <div class="matrix-q" style="background:var(--teal-lt);">
+          <div class="matrix-q-label" style="color:var(--teal);">Low effort · High impact — Do now</div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--teal)"></div><div><strong>Bet 1</strong> — Agent handover context card<br><span style="color:var(--faint)">Presentation layer. Data already exists.</span></div></div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--teal)"></div><div><strong>Bet 2</strong> — Merchant SLA enforcement<br><span style="color:var(--faint)">Rule engine. Ships in a sprint.</span></div></div>
+        </div>
+        <div class="matrix-q">
+          <div class="matrix-q-label" style="color:var(--blue);">Higher effort · High impact — Plan next</div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--blue)"></div><div><strong>Bet 3</strong> — Credit error status comms<br><span style="color:var(--faint)">Needs bureau confirmation loop built first.</span></div></div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--blue)"></div><div><strong>Bet 4</strong> — Escalation prediction model<br><span style="color:var(--faint)">Needs re-contact data as training signal.</span></div></div>
+        </div>
+        <div class="matrix-q" style="background:var(--surface);">
+          <div class="matrix-q-label" style="color:var(--faint);">Low effort · Lower impact — Later</div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--faint)"></div><div>Generic FAQ / chatbot improvements<br><span style="color:var(--faint)">60% deflection already strong here.</span></div></div>
+        </div>
+        <div class="matrix-q" style="background:var(--red-lt);">
+          <div class="matrix-q-label" style="color:var(--red);">High effort · Higher risk — Avoid now</div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--red)"></div><div>Automate fraud determination<br><span style="color:var(--faint)">Consequence of error too high at this stage.</span></div></div>
+          <div class="matrix-item"><div class="matrix-dot" style="background:var(--red)"></div><div>Replace Zendesk / rebuild CRM<br><span style="color:var(--faint)">Build on top of existing platform, not over it.</span></div></div>
+        </div>
+      </div>
+      <div class="matrix-axes">
+        <span>← Lower effort</span>
+        <span style="text-align:center;">Impact ↑ / ↓</span>
+        <span>Higher effort →</span>
+      </div>
+    </div>
+
+    <div class="insight amber">
+      <strong>What to avoid:</strong> Three of the four bets are not AI problems — they're workflow and communication problems. The temptation in a PM role is to lead with the AI story because it sounds more ambitious. But the highest-ROI interventions here are a handover card, a scheduling rule, and a better notification template. Leading with those, then layering AI on top once the data foundation exists, is the more credible and more defensible sequence.
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- METRICS -->
+<section id="metrics">
+  <div class="page">
+    <div class="section-header">
+      <div class="eyebrow">Success metrics</div>
+      <div class="sec-title">How to know if the bets are working</div>
+      <p class="sec-desc">Each bet has a primary metric that makes its impact legible. Establishing baselines for all four before building anything is non-negotiable — without baselines, there is no way to demonstrate that anything shipped actually moved the needle.</p>
+    </div>
+    <div class="card">
+      <div class="metric-row">
+        <div class="metric-name">Re-contact rate</div>
+        <div class="metric-desc">% of cases that generate a second contact within 30 days on the same issue. Primary proxy for FCR. Baselining this by case type (credit, fraud, dispute) is the first action before any build starts.</div>
+        <div class="metric-target" style="color:var(--teal)">Target: -30% · Bet 1 + 2</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-name">AHT by case type</div>
+        <div class="metric-desc">Average handle time, segmented by credit error / fraud / dispute. Not aggregate AHT — aggregate hides the case types that are dragging the number. Need case-type-level visibility to measure Bet 1's handover card impact.</div>
+        <div class="metric-target" style="color:var(--blue)">Target: -25% · Bet 1</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-name">Dispute resolution time</div>
+        <div class="metric-desc">Days from dispute creation to resolution decision. Current baseline unknown — the merchant SLA enforcement (Bet 2) should compress this directly. Merchant response time is the primary sub-metric to instrument.</div>
+        <div class="metric-target" style="color:var(--purple)">Target: -50% P75 · Bet 2</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-name">Credit correction cycle</div>
+        <div class="metric-desc">Time from credit error case creation to confirmed bureau acknowledgment of correction. This metric doesn't exist today if there's no bureau confirmation tracking — Bet 3 creates the metric and moves it simultaneously.</div>
+        <div class="metric-target" style="color:var(--amber)">Target: confirmed in &lt;10 days · Bet 3</div>
+      </div>
+      <div class="metric-row" style="border-bottom:none;">
+        <div class="metric-name">CFPB filing rate</div>
+        <div class="metric-desc">CFPB complaints per 10K accounts, tracked monthly by case category. The lagging indicator — improvements in the metrics above should show up here 30–60 days later. Useful as the ultimate validation that the bets are producing real outcomes.</div>
+        <div class="metric-target" style="color:var(--red)">Target: -15% · Bet 4</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<div class="about-strip">
+  <div class="about-inner">
+    <div class="about-avatar">G</div>
+    <div>
+      <div class="about-name">Ganesh Haridas</div>
+      <div class="about-role">Candidate — Group Product Manager, Consumer Servicing · Affirm</div>
+      <p class="about-body">This document is a research project built on publicly available data — 15,322 CFPB complaints and 926 consumer reviews — that translates complaint patterns into workflow-level diagnoses and specific product bets. Assumptions about Affirm's internal architecture are labeled explicitly throughout. The goal is to demonstrate the depth of thinking behind the opportunity, not to claim knowledge of Affirm's actual systems.</p>
+    </div>
+  </div>
+</div>
+
+<footer>Ganesh Haridas · 2026</footer>
+
+<script>
+function tog(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+</script>
+</body>
+</html>
